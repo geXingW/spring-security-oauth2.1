@@ -1,0 +1,17 @@
+server:
+  port: 8092
+
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: server_route
+          uri: http://localhost:8090
+          predicates:
+            - Path=/oauth2/*,/authorized
+
+        - id: resource_route
+          uri: http://localhost:8091
+          predicates:
+            - Path=/user

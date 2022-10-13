@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>授权成功！</h1>
+
+<button type="button" onclick="getToken()">获取Token</button>
+
+<h1>获取资源</h1>
+<button type="button" onclick="fetchUser()">获取用户信息</button>
+<button type="button" onclick="fetchResource()">获取受保护资源</button>
+
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/Base64/1.1.0/base64.js"></script>
+<script>
+  //获取url中的参数
+  function getUrlParam (name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+    if (r != null) return unescape(r[2]);
+    return null; //返回参数值
+  }
+
+  var accessToken
+
+  function getToken () {
+    let code = getUrlParam("code")
+    let url = "/oauth2/token?client_id=client&redirect_uri=http://127.0.0.1:8090/authorized&grant_type=authorization_code&code_verifier=zrD45eQtn89qcK5lL6GTFXoEVZGjYKBf-XBMz_uB8uo&code=" + code;
+
+    // $.post(url, function (data) {
+    //   console.log(data)
+    // });
+
+    let base64Header1 = "Y2xpZW50OnNlY3JldA==" // client:secret
+    let base64Header2 = "ODAwMDAwMDAxMDpzZWNyZXQ=" // 8000000010:secret
+
+
+    $.ajax({
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Basic " + base64Header2
+      },
+      url: url,
+      method: 'post',
+      success (data) {
+        accessToken = data.accessToken
+        console.log(data)
+      }
+    })
+  }
+
+  function fetchUser(){
+    $.ajax({
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken
+      },
+      url: '/user',
+      method: 'get',
+      success (data) {
+        console.log(data)
+      }
+    })
+  }
+
+  function fetchResource(){
+
+  }
+</script>
+</body>
+</html>
